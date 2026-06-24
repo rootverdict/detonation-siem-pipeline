@@ -1,0 +1,46 @@
+<!-- ============================================================
+     Custom SOC Lab Detection Rules
+     Repo: rootverdict/detonation-siem-pipeline
+     Maintainer: rootverdict
+     Last updated: 2026-06-24
+
+     Rule ID allocation:
+       100001        - T1059.001  PowerShell encoded command execution
+       100002        - T1053.005  Scheduled task creation via schtasks
+       100003-100099 - Reserved for W2 detections
+       100100+       - Reserved for W3+ detections
+     ============================================================ -->
+
+<group name="custom_soc,windows,sysmon,">
+
+  <!-- T1059.001 - PowerShell Encoded Command Execution
+       Source:   Sysmon EID 1 (Process Create)
+       Triggers: -enc, -encodedcommand, IEX, Invoke-Expression, DownloadString
+       Level:    12 (high) -->
+  <rule id="100001" level="12">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)powershell\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(-enc|-encodedcommand|IEX|Invoke-Expression|DownloadString)</field>
+    <description>T1059.001 - PowerShell encoded/obfuscated command execution detected</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+    <group>attack,execution,powershell,t1059_001,</group>
+  </rule>
+
+  <!-- T1053.005 - Scheduled Task Creation via schtasks.exe
+       Source:   Sysmon EID 1 (Process Create)
+       Triggers: schtasks.exe with /create flag
+       Level:    10 (medium-high) -->
+  <rule id="100002" level="10">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)schtasks\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)/create</field>
+    <description>T1053.005 - Scheduled task created via schtasks.exe</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+    <group>attack,persistence,scheduled_task,t1053_005,</group>
+  </rule>
+
+</group>

@@ -1,0 +1,36 @@
+title: Scheduled Task Creation via schtasks.exe
+id: a1b2c3d4-0002-4000-8000-000000000002
+status: stable
+description: >
+    Detects schtasks.exe invoked with the /create flag, indicating a new scheduled
+    task is being registered. Adversaries use scheduled tasks to establish persistence
+    that survives reboots and runs under elevated or SYSTEM context.
+references:
+    - https://attack.mitre.org/techniques/T1053/005/
+    - https://docs.microsoft.com/en-us/windows/win32/taskschd/schtasks
+author: rootverdict
+date: 2026-06-24
+tags:
+    - attack.persistence
+    - attack.privilege_escalation
+    - attack.t1053.005
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\schtasks.exe'
+        CommandLine|contains: '/create'
+    condition: selection
+falsepositives:
+    - Software installers registering legitimate update tasks
+    - Windows built-in maintenance tasks created during OS setup
+    - Known admin tooling — filter by ParentImage and task name (/tn)
+fields:
+    - Image
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - User
+    - IntegrityLevel
+level: medium
