@@ -1,0 +1,35 @@
+title: C2 Domain DNS Beacon via CDB Blocklist
+id: a3f8c2d1-9b4e-4f7a-8c2d-1a9b4e4f7a8c
+status: experimental
+description: >
+  Detects DNS queries to known C2 domains matched against a Wazuh CDB blocklist.
+  Sysmon EID 22 captures all DNS query events including the querying process,
+  enabling process-level attribution of C2 beacon activity.
+author: rootverdict
+date: 2026-06-25
+references:
+  - https://attack.mitre.org/techniques/T1071/001/
+  - https://docs.wazuh.com/current/user-manual/ruleset/cdb-list.html
+tags:
+  - attack.command_and_control
+  - attack.t1071.001
+logsource:
+  product: windows
+  category: dns_query
+detection:
+  selection:
+    EventID: 22
+    QueryName|contains:
+      - 'evil-c2.com'
+      - 'malware-beacon.net'
+      - 'cobaltstrike-teamserver.xyz'
+  condition: selection
+falsepositives:
+  - Legitimate software querying domains that share naming patterns with blocklist entries
+  - Miscategorised threat intel — validate every CDB entry before production use
+level: high
+fields:
+  - QueryName
+  - Image
+  - ProcessId
+  - User

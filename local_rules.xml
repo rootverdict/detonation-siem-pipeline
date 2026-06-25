@@ -43,4 +43,18 @@
     <group>attack,persistence,scheduled_task,t1053_005,</group>
   </rule>
 
+
+  <!-- T1071.001 - C2 domain beacon detected via DNS query (Sysmon EID 22)
+       Source:   Sysmon EID 22 (DNS Query)
+       Triggers: queryName matches entry in c2_domains CDB list
+       Level:    14 (critical) -->
+  <rule id="100003" level="14">
+    <if_group>sysmon_event_22</if_group>
+    <list field="win.eventdata.queryName" lookup="match_key">etc/lists/c2_domains</list>
+    <description>T1071.001 - DNS query to known C2 domain detected: $(win.eventdata.queryName)</description>
+    <mitre>
+      <id>T1071.001</id>
+    </mitre>
+    <group>attack,command_and_control,dns,t1071_001,</group>
+  </rule>
 </group>
